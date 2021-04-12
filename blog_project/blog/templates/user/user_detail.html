@@ -1,0 +1,8 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+    <h1>Profile</h1>
+    <hr style="border-width: 2px;background-color: black;">
+    <h2>Username: {{ user.username }}</h2>
+    <h2>Post : {{ num_post }}</h2>
+    <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
+{% endblock content %}

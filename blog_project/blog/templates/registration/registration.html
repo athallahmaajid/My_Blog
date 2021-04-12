@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="jumbotron">
+    <h2>Please Register:</h2>
+
+    <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <p></p>
+        <input class="btn btn-primary" type="submit" value="Register">
+        <input type="hidden" name="next" id="{{next}}">
+    </form>
+</div>
+
+{% endblock %}
