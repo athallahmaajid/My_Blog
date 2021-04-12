@@ -6,8 +6,12 @@
 
     <form action="{% url 'register' %}" method="POST">
         {% csrf_token %}
-        {{ form|crispy }}
-        <p></p>
+        <p>Username</p>
+        <p>{{ form.username }}</p>
+        <p>Email</p>
+        <p>{{ form.email }}</p>
+        <p>Password</p>
+        <p>{{ form.password }}</p>
         <input class="btn btn-primary" type="submit" value="Register">
         <input type="hidden" name="next" id="{{next}}">
     </form>

@@ -10,6 +10,8 @@
             <p>Comments: {{ post.approve_comments.count }}</p>
             <hr style="background-color: black;border-width: 2px;">
         </div>
+    {% empty %}
+        <h1>There is no Post Here</h1>
     {% endfor %}
 </div>
 {% endblock %}
