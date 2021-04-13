@@ -121,5 +121,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+
+LOGOUT_URL = 'user_detail'
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'post-list'
 LOGOUT_REDIRECT_URL = 'post-list'

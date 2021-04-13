@@ -4,18 +4,30 @@ from django.views.generic.edit import DeleteView
 from blog.forms import PostForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.urls import reverse_lazy
 from blog.models import Post, Comment
 from blog.forms import PostForm, CommentForm, UserForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (TemplateView, ListView,
                                   DetailView, CreateView,
                                   UpdateView)
+
+
+
+
+def logout_required(function=None, logout_url=settings.LOGOUT_URL):
+    actual_decorator = user_passes_test(
+        lambda u: not u.is_authenticated,
+        login_url=logout_url
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
 
 # Create your views here.
 class AboutView(TemplateView):
@@ -75,10 +87,12 @@ class DraftListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Post.objects.filter(published_date__isnull=True).order_by('create_date')
 
+
 class UserDetailView(LoginRequiredMixin, DetailView):
     login_url = '/login/'
     model = User
     template_name = 'user/user_detail.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['num_post'] = Post.objects.filter(author=self.request.user).count()
@@ -91,12 +105,11 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     template_name = "user/user_form.html"
     def dispatch(self, request, *args, **kwargs):
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
-        else:
-            handler = self.http_method_not_allowed
-        return handler(request, *args, **kwargs)
-
+        """ Making sure that only authors can update stories """
+        obj = self.get_object()
+        if str(obj.username) != str(self.request.user):
+            return redirect('post-list')
+        return super(UserUpdateView, self).dispatch(request, *args, **kwargs)
 #######################################################################################################
 #######################################################################################################
 
@@ -135,6 +148,7 @@ def comment_remove(request, pk):
     comment.delete()
     return redirect('post_detail', post_pk)
 
+@logout_required
 def user_register(request):
     registered = False
 

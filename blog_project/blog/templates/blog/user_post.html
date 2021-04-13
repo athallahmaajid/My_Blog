@@ -1,0 +1,19 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<div class="centerstage">
+    {% for post in post_list %}
+        {% if post.author == user %}
+            <div class="post">
+                <h1><a style="color: #2b2f36;" href="{% url 'post_detail' pk=post.pk %}">{{post.title}}</a></h1>
+                <div class="date">
+                    <p>Published on {{post.published|date:"D M Y"}}</p>
+                </div>
+                <p>Comments: {{ post.approve_comments.count }}</p>
+                <hr style="background-color: black;border-width: 2px;">
+            </div>
+        {% endif %}
+    {% empty %}
+        <h1>There is no Post Here</h1>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -46,7 +46,7 @@
                             <a class="nav nav-link" href="{% url 'post_draft_list' %}">Drafts</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav nav-link" href="{% url 'user_detail' pk=user.pk %}">Profile</a>
+                            <a class="nav nav-link" href="{% url 'user_detail' pk=request.user.pk %}">Profile</a>
                         </li>
                         {% else %}
                         <li class="nav-item "><a style="font-family:'Courier New', Courier, monospace;" class="nav nav-link" href="{% url 'login' %}">Login</a></li>
