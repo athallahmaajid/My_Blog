@@ -27,4 +27,5 @@ urlpatterns = [
     path(r'accounts/register/', views.user_register, name="register"),
     path(r'user/<int:pk>/detail', views.UserDetailView.as_view(), name="user_detail"),
     path(r'user/<int:pk>/edit', views.UserUpdateView.as_view(), name="user_edit"),
+    path(r'user/<int:pk>/posts', views.UserPostList.as_view(), name="user_posts"),
 ]

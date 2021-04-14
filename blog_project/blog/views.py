@@ -87,6 +87,11 @@ class DraftListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Post.objects.filter(published_date__isnull=True).order_by('create_date')
 
+class UserPostList(ListView):
+    model = Post
+    def get_queryset(self):
+        return Post.objects.filter(author__id=self.kwargs.get('pk'), published_date__lte=timezone.now()).order_by('-published_date')
+
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     login_url = '/login/'
