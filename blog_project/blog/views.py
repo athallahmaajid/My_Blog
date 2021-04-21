@@ -4,9 +4,10 @@ from django.views.generic.edit import DeleteView
 from blog.forms import PostForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.urls import reverse_lazy
+from django.db.models import Q
 from blog.models import Post, Comment
 from blog.forms import PostForm, CommentForm, UserForm
 from django.contrib.auth.decorators import login_required
@@ -18,8 +19,6 @@ from django.views.generic import (TemplateView, ListView,
                                   UpdateView)
 
 
-
-
 def logout_required(function=None, logout_url=settings.LOGOUT_URL):
     actual_decorator = user_passes_test(
         lambda u: not u.is_authenticated,
@@ -29,9 +28,11 @@ def logout_required(function=None, logout_url=settings.LOGOUT_URL):
         return actual_decorator(function)
     return actual_decorator
 
+
 # Create your views here.
 class AboutView(TemplateView):
     template_name = 'blog/about.html'
+
 
 class PostListView(ListView):
     model = Post
@@ -39,8 +40,10 @@ class PostListView(ListView):
     def get_queryset(self):
         return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
 
+
 class PostDetailView(DetailView):
     model = Post
+
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     login_url = '/login/'
@@ -52,32 +55,44 @@ class CreatePostView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super(CreatePostView, self).form_valid(form)
 
+
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
     redirect_field_name = 'blog/post_detail.html'
     form_class = PostForm
     model = Post
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.author != self.request.user:
+            return redirect('post-list')
+        return super().post(request, *args, **kwargs)
+
+
+class PostDeleteView(DeleteView):
+    model = Post
+    success_url = reverse_lazy('post-list')
+
     def dispatch(self, request, *args, **kwargs):
+        # Try to dispatch to the right method; if a method doesn't exist,
+        # defer to the error handler. Also defer to the error handler if the
+        # request method isn't on the approved list.
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
 
-class PostDeleteView(DeleteView):
+class SearchPostList(ListView):
     model = Post
-    success_url = reverse_lazy('post-list')
-    def delete(self, request, *args, **kwargs):
-        """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
-        """
-        self.object = self.get_object()
-        success_url = self.get_success_url()
-        if self.object.author == self.request.user:
-            return redirect('post_remove', pk=Post.pk) # Also add id of Article
+    template_name = 'blog/post_list.html'
 
-        return redirect('post-list')
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        object_list = Post.objects.filter(
+            Q(title__icontains=query) & Q(published_date__lte=timezone.now())
+            ).order_by('-published_date')
+        return object_list
 
 class DraftListView(LoginRequiredMixin, ListView):
     login_url = '/login/'
@@ -87,10 +102,26 @@ class DraftListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Post.objects.filter(author=self.request.user, published_date__isnull=True).order_by('create_date')
 
+
+class UserListView(ListView):
+    model = User
+    template_name = 'user/user_list.html'
+
+    def get_queryset(self):
+        return User.objects.order_by('?')
+
+
 class UserPostList(ListView):
     model = Post
+
     def get_queryset(self):
-        return Post.objects.filter(author__id=self.kwargs.get('pk'), published_date__lte=timezone.now()).order_by('-published_date')
+        return Post.objects.filter(author__id=self.kwargs.get('pk'), published_date__lte=timezone.now()).order_by(
+            '-published_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = Post.objects.filter(author__id=self.kwargs.get('pk')).count()
+        return context
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -100,8 +131,9 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['num_post'] = Post.objects.filter(author=self.request.user).count()
+        context['num_post'] = Post.objects.filter(author__id=self.kwargs.get('pk')).count()
         return context
+
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     login_url = '/login/'
@@ -109,12 +141,15 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserForm
     model = User
     template_name = "user/user_form.html"
+
     def dispatch(self, request, *args, **kwargs):
         """ Making sure that only authors can update stories """
         obj = self.get_object()
         if str(obj.username) != str(self.request.user):
             return redirect('post-list')
         return super(UserUpdateView, self).dispatch(request, *args, **kwargs)
+
+
 #######################################################################################################
 #######################################################################################################
 
@@ -123,6 +158,7 @@ def post_publish(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.publish()
     return redirect('post_detail', pk=pk)
+
 
 @login_required
 def add_comment_to_post(request, pk):
@@ -138,7 +174,8 @@ def add_comment_to_post(request, pk):
 
     else:
         form = CommentForm()
-    return render(request, "blog/comment_form.html", {"form":form})
+    return render(request, "blog/comment_form.html", {"form": form})
+
 
 @login_required
 def comment_approve(request, pk):
@@ -146,12 +183,14 @@ def comment_approve(request, pk):
     comment.approve()
     return redirect('post_detail', pk=comment.post.pk)
 
+
 @login_required
 def comment_remove(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     post_pk = comment.post.pk
     comment.delete()
     return redirect('post_detail', post_pk)
+
 
 @logout_required
 def user_register(request):
@@ -172,4 +211,4 @@ def user_register(request):
     else:
         user_form = UserForm()
 
-    return render(request, "registration/registration.html", {'registered':registered, 'form':user_form})
+    return render(request, "registration/registration.html", {'registered': registered, 'form': user_form})

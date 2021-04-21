@@ -1,0 +1,13 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<div class="centerstage">
+    {% for user in user_list %}
+        <div class="post">
+            <h1><a style="color: #2b2f36;" href="{% url 'user_detail' pk=user.pk %}">{{user.username}}</a></h1>
+            <hr style="background-color: black;border-width: ">
+        </div>
+    {% empty %}
+        <h1>There is no User</h1>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -3,6 +3,7 @@ from blog import views
 
 urlpatterns = [
     path(r"", views.PostListView.as_view(), name="post-list"),
+    path("search/", views.SearchPostList.as_view(), name="search_post"),
     path(r"about/", views.AboutView.as_view(), name="about"),
     path(r"post/<int:pk>", views.PostDetailView.as_view(), name="post_detail"),
     path(r"post/new/", views.CreatePostView.as_view(), name="post_create"),

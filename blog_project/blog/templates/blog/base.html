@@ -24,7 +24,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,100&family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-dark bg-dark techfont custom-navbar navbar-expand-lg">
@@ -35,7 +35,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
                 </ul>
                 <ul class="nav navbar-nav" style="margin-right: 0px;">
                     {% if user.is_authenticated %}
