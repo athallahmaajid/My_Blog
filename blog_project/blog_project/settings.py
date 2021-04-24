@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +71,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
-
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+}
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
@@ -121,8 +126,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGOUT_URL = 'user_detail'
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'post-list'
-LOGOUT_REDIRECT_URL = 'post-list'
+LOGIN_REDIRECT_URL = 'post_list'
+LOGOUT_REDIRECT_URL = 'post_list'

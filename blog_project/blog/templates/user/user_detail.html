@@ -1,13 +1,15 @@
 {% extends 'blog/base.html' %}
 {% load extras %}
 {% block content %}
-    <h1>Profile</h1>
+<style>
+    .right{
+        margin-right: 0px;
+    }
+</style>
+    <h1>Profile <a class="right btn btn-primary" href="{% url 'user_edit' pk=user.pk %}">Edit</a> <a class="right btn btn-primary" href="{% url 'logout' %}">Logout</a>
+    </h1>
     <hr style="border-width: 2px;background-color: black;">
     <h2>Username: {{ user.username }}</h2>
     <h2>Posts: <a href="{% url 'user_posts' pk=user.pk %}">Posts</a></h2>
     <h2>Total Posts : {{ num_post }}</h2>
-    {% if request.user|string == user.username %}
-        <a class="btn btn-primary" href="{% url 'user_edit' pk=user.pk %}">Edit</a>
-        <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
-    {% endif %}
 {% endblock content %}

@@ -10,32 +10,29 @@
             <a href="{% url 'user_detail' pk=post.author.pk %}">{{ post.author }}</a>
         </div>
     {% else %}
-        <a class="btn btn-primary" href="{% url 'post_publish' pk=post.pk %}">Publish</a>
+        <a class="btn btn-primary" href="{% url 'post_publish' slug=post.slug %}">Publish</a>
     {% endif %}
     <p class="postcontent">{{ post.text|safe|linebreaksbr }}</p>
 
     {% if user.username == post.author|string %}
-        <a class="btn btn-primary" href="{% url 'post_edit' pk=post.pk%}">
+        <a class="btn btn-primary" href="{% url 'post_edit' slug=post.slug%}">
             <span class="fa fa-pencil"></span>
         </a>
-        <a class="btn btn-primary" href="{% url 'post_remove' pk=post.pk %}">
+        <a class="btn btn-primary" href="{% url 'post_remove' slug=post.slug %}">
             <span class="fa fa-trash"></span>
         </a>
     {% endif %}
     <hr>
-    <a class="btn btn-primary btn-comment" href="{% url 'add_comment_to_post' pk=post.pk %}">Add Comment</a>
+    <a class="btn btn-primary btn-comment" href="{% url 'add_comment_to_post' slug=post.slug %}">Add Comment</a>
     <div class="container">
         {% for comment in post.comments.all %}
             <br>
-            {% if user.is_authenticated or comment.approved_comment %}
+            {% if user.is_authenticated %}
                 {{ comment.created_date }}
-                {% if not comment.approved_comment %}
-                <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}">
-                    <span class="fa fa-trash"></span>
-                </a>
-                <a class="btn btn-default" href="{% url 'comment_approve' pk=comment.pk %}">
-                    <span class="fa fa-check-circle"></span>
-                </a>
+                {% if user.username == comment.author|string %}
+                    <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}">
+                        <span class="fa fa-trash"></span>
+                    </a>
                 {% endif %}
                 <p>{{ comment.text|safe|linebreaks }}</p>
                 <p>Posted By: {{ comment.author }}</p>
