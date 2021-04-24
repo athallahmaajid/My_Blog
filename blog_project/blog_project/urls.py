@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.contrib.auth import views as vs
 from blog import views
 
-
 urlpatterns = [
     path(r'admin/', admin.site.urls),
     path(r'', include('blog.urls')),
