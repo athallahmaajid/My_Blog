@@ -61,6 +61,20 @@ class PostAPIView(APIView):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
+class CommentAPIView(APIView):
+    serializer_class = CommentSerializer
+    def post(self, request, format=None):
+        data = request.data
+        serializer = CommentSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def get(self, request, format=None):
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
 
 class PostDetailView(DetailView):
     model = Post

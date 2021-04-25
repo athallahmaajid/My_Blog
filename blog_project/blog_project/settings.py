@@ -71,11 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": (
-        'rest_framework.permissions.IsAdminUser',
-    ),
-}
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 

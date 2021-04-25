@@ -30,5 +30,5 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ("create_date", "published_date")
 
     def to_representation(self, instance):
-        data = super(PostSerializer, self).to_representation(instance)
+        data = super(CommentSerializer, self).to_representation(instance)
         return data
