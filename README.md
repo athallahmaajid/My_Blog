@@ -24,4 +24,8 @@ Run the app:
 ```
 python manage.py runserver
 ```
-And, Voila! the blog app is run on 127.0.0:8000
+And, Voila! the blog app is run on http://127.0.0:8000
+
+To Check the Post API you can go here:
+Post   : http://127.0.0.1:8000/api/posts
+Comment: http://127.0.0.1:8000/api/comments
