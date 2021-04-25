@@ -71,6 +71,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+}
+
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
@@ -111,8 +120,6 @@ TIME_ZONE = 'Asia/Pontianak'
 USE_I18N = True
 
 USE_L10N = True
-
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

@@ -9,8 +9,11 @@ class PostSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source="author", read_only=True)
     class Meta:
         model = Post
-        fields = ('id', "author_name", "title", "text", "author")
-        read_only_fields = ("create_date", "published_date")
+        fields = ('id', "author_name", "title", "text", "author", "published_date", "create_date")
+        kwargs = {
+            "published_date": {'read_only':True},
+            "create_date": {'read_only':True}
+        }
 
     def create(self, validated_data):
         instance = super().create(validated_data)
@@ -18,9 +21,6 @@ class PostSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def to_representation(self, instance):
-        data = super(PostSerializer, self).to_representation(instance)
-        return data
 
 class CommentSerializer(serializers.ModelSerializer):
     post_title = serializers.CharField(source="post", read_only=True)

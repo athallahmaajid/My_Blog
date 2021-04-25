@@ -14,8 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from rest_framework import viewsets
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
@@ -47,7 +46,7 @@ class PostListView(ListView):
         return Post.objects.filter(published_date__lte=timezone.now()).order_by('-published_date')
 
 
-class PostAPIView(APIView):
+class PostListAPI(APIView):
     serializer_class = PostSerializer
     def post(self, request, format=None):
         data = request.data
@@ -55,13 +54,13 @@ class PostAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, format=None):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
-class CommentAPIView(APIView):
+class CommentListAPI(APIView):
     serializer_class = CommentSerializer
     def post(self, request, format=None):
         data = request.data
@@ -69,13 +68,62 @@ class CommentAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, format=None):
         comments = Comment.objects.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
+class PostDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            raise status.Http404
+
+    def get(self, request, pk, format=None):
+        post = self.get_object(pk)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        post = self.get_object(pk)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        post = self.get_object(pk)
+        post.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CommentDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Comment.objects.get(pk=pk)
+        except Comment.DoesNotExist:
+            raise status.Http404
+
+    def get(self, request, pk, format=None):
+        comment = self.get_object(pk)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        comment = self.get_object(pk)
+        serializer = CommentSerializer(comment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        comment = self.get_object(pk)
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 class PostDetailView(DetailView):
     model = Post
 
