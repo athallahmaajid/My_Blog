@@ -1,13 +1,12 @@
 from django import forms
-from blog.models import Post, Comment
-from django.contrib.auth.models import User
+from blog.models import Post, Comment, UserInfo
 from django.contrib.auth.forms import UserCreationForm
 
 
-# class UserCreate(UserCreationForm):
-#     class Meta:
-#         model = UserInfo
-#         fields = ("username",'email', 'password')
+class UserCreate(UserCreationForm):
+    class Meta:
+        model = UserInfo
+        fields = ("username",'email', 'password')
 
 class PostForm(forms.ModelForm):
     auto_id = True
@@ -34,5 +33,5 @@ class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
-        model = User
+        model = UserInfo
         fields = ('username', 'email', 'password')

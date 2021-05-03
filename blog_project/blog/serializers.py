@@ -1,9 +1,7 @@
 from django.contrib import auth
 from rest_framework import serializers
-from .models import Post, Comment
-from django.contrib.auth.models import User
+from .models import Post, Comment, UserInfo
 from django.utils.text import slugify
-from django.contrib.auth.models import User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -26,7 +24,7 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     post_title = serializers.CharField(source="post", read_only=True)
     class Meta:
-        model = Post
+        model = Comment
         fields = ('id', "post_title", "text", "author")
         read_only_fields = ("create_date", "published_date")
 
@@ -36,5 +34,5 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = UserInfo
         fields = ('id', "username", "email", "password")
