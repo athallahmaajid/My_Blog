@@ -32,7 +32,75 @@
   position: absolute;
   right: 0px;
 }
-
+.commentclass{
+  height: 60px;
+  overflow: hidden;
+  resize: none;
+  width: 100%;
+  background: #fff;
+  border: none;
+  outline: 0;
+  line-height: 20px;
+  margin: 6px 0;
+  display: block;
+}
+.commentborder{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
+  -ms-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+  -webkit-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  width: auto;
+  border: 1px solid #e5e5e5;
+}
+.commentfooter{
+  border: 1px solid #e5e5e5;
+  border-top: none;
+  -webkit-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: block;
+  height: 40px;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 6px 8px;
+  clear: both;
+}
+#cancelbutton{
+  border: none;
+  background-color: transparent;
+  margin-right: 0px;
+}
+#commentbutton{
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  border: 2px inset transparent;
+  height: 28px;
+  cursor: pointer;
+  font-weight: bold;
+  padding-left: 8px;
+  padding-right: 8px;
+  line-height: 20px;
+  font-size: 14px;
+  background: #07f;
+  color: #fff;
+  padding: 0 10px;
+  width: fit-content;
+  display:inline-block;
+  overflow: auto;
+  white-space: nowrap;
+  float: right;
+}
 /* COLOR CHANGER BELOW */
 
 .loader {

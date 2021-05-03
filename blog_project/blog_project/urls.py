@@ -24,8 +24,8 @@ urlpatterns = [
     path(r'accounts/login/', vs.LoginView.as_view(template_name='registration/login.html'), name="login"),
     path(r'accounts/logout/', vs.LogoutView.as_view(), name="logout", kwargs={'next_page':'/'}),
     path(r'accounts/register/', views.user_register, name="register"),
-    path(r'user/<int:pk>/detail', views.UserDetailView.as_view(), name="user_detail"),
-    path(r'user/<int:pk>/edit', views.UserUpdateView.as_view(), name="user_edit"),
-    path(r'user/<int:pk>/posts', views.UserPostList.as_view(), name="user_posts"),
+    path(r'user/<slug:slug>/detail', views.UserDetailView.as_view(), name="user_detail"),
+    path(r'user/<slug:slug>/edit', views.UserUpdateView.as_view(), name="user_edit"),
+    path(r'user/<slug:slug>/posts', views.UserPostList.as_view(), name="user_posts"),
     path(r'users/', views.UserListView.as_view(), name="user_list"),
 ]

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
 from django.views.generic.edit import DeleteView
 from blog.forms import PostForm
 from django.shortcuts import render, get_object_or_404, redirect
@@ -13,13 +14,13 @@ from blog.forms import PostForm, CommentForm, UserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from .serializers import PostSerializer, CommentSerializer, UserSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAdminUser
-from django.contrib.auth.models import User
+from .models import UserInfo
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (TemplateView, ListView,
                                   DetailView, CreateView,
@@ -60,6 +61,22 @@ class PostListAPI(APIView):
         posts = Post.objects.all()
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
+
+class UserListAPI(APIView):
+    serializer_class = UserSerializer
+    def post(self, request, format=None):
+        data = request.data
+        serializer = UserSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, format=None):
+        posts = UserInfo.objects.all()
+        serializer = UserSerializer(posts, many=True)
+        return Response(serializer.data)
+
 class CommentListAPI(APIView):
     serializer_class = CommentSerializer
     def post(self, request, format=None):
@@ -82,21 +99,21 @@ class PostDetail(APIView):
         except Post.DoesNotExist:
             raise status.Http404
 
-    def get(self, request, pk, format=None):
-        post = self.get_object(pk)
+    def get(self, request, slug, format=None):
+        post = self.get_object(slug)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        post = self.get_object(pk)
+    def put(self, request, slug, format=None):
+        post = self.get_object(slug)
         serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
-        post = self.get_object(pk)
+    def delete(self, request, slug, format=None):
+        post = self.get_object(slug)
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -127,9 +144,14 @@ class CommentDetail(APIView):
 class PostDetailView(DetailView):
     model = Post
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm()
+        return context
+
 
 class CreatePostView(LoginRequiredMixin, CreateView):
-    login_url = '/login/'
+    login_url = '/accounts/login/'
     redirect_field_name = 'blog/post_detail.html'
     form_class = PostForm
     model = Post
@@ -140,7 +162,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
 
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
-    login_url = '/login/'
+    login_url = '/accounts/login/'
     redirect_field_name = 'blog/post_detail.html'
     form_class = PostForm
     model = Post
@@ -155,17 +177,6 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 class PostDeleteView(DeleteView):
     model = Post
     success_url = reverse_lazy('post_list')
-
-    def dispatch(self, request, *args, **kwargs):
-        # Try to dispatch to the right method; if a method doesn't exist,
-        # defer to the error handler. Also defer to the error handler if the
-        # request method isn't on the approved list.
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
-        else:
-            handler = self.http_method_not_allowed
-        return handler(request, *args, **kwargs)
-
 class SearchPostList(ListView):
     model = Post
     template_name = 'blog/post_list.html'
@@ -178,7 +189,7 @@ class SearchPostList(ListView):
         return object_list
 
 class DraftListView(LoginRequiredMixin, ListView):
-    login_url = '/login/'
+    login_url = '/accounts/login/'
     redirect_field_name = 'blog/post_draft_list.html'
     model = Post
 
@@ -187,11 +198,11 @@ class DraftListView(LoginRequiredMixin, ListView):
 
 
 class UserListView(ListView):
-    model = User
+    model = UserInfo
     template_name = 'user/user_list.html'
 
     def get_queryset(self):
-        return User.objects.order_by('?')
+        return UserInfo.objects.order_by('?')
 
 
 class UserPostList(ListView):
@@ -208,8 +219,8 @@ class UserPostList(ListView):
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
-    login_url = '/login/'
-    model = User
+    login_url = '/accounts/login/'
+    model = UserInfo
     template_name = 'user/user_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -220,10 +231,10 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    login_url = '/login/'
+    login_url = '/accounts/login/'
     redirect_field_name = 'blog/post_detail.html'
     form_class = UserForm
-    model = User
+    model = UserInfo
     template_name = "user/user_form.html"
 
     def dispatch(self, request, *args, **kwargs):
@@ -255,10 +266,9 @@ def add_comment_to_post(request, slug):
             comment.post = post
             comment.save()
             return redirect('post_detail', slug=post.slug)
-
     else:
         form = CommentForm()
-    return render(request, "blog/comment_form.html", {"form": form})
+    return render(request, "blog/post_detail.html", {"form": form})
 
 
 @login_required

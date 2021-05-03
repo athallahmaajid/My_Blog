@@ -16,10 +16,11 @@
         </form>
     </div>
     {% for post in post_list %}
-        <div class="post">
-            <h1><a style="color: #2b2f36;" href="{% url 'post_detail' slug=post.slug %}">{{post.title}}</a></h1>
+    <div class="post">
+        <h1><a style="color: #2b2f36;" href="{% url 'post_detail' slug=post.slug %}">{{post.title}}</a></h1>
             <div class="date">
-                <p>Published on {{post.published|date:"D M Y"}}</p>
+                <p>Published on: {{post.published_date|date:"D M Y"}}</p>
+                <p>Author: <a href="{% url 'user_detail' slug=post.author %}">{{post.author}}</a></p>
             </div>
             <p>Comments: {{ post.comments.count }}</p>
             <hr style="background-color: black;border-width: 2px;">

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Post, Comment
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.contrib.auth.models import User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -32,3 +33,8 @@ class CommentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(CommentSerializer, self).to_representation(instance)
         return data
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', "username", "email", "password")

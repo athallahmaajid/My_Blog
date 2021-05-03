@@ -7,12 +7,12 @@
     {% if post.published_date %}
         <div class="date postdate">
             {{ post.published_date }}
-            <a href="{% url 'user_detail' pk=post.author.pk %}">{{ post.author }}</a>
+            <a href="{% url 'user_detail' slug=post.author %}">{{ post.author }}</a>
         </div>
     {% else %}
         <a class="btn btn-primary" href="{% url 'post_publish' slug=post.slug %}">Publish</a>
     {% endif %}
-    <p class="postcontent">{{ post.text|safe|linebreaksbr }}</p>
+    <p class="postcontent">{{ post.text|safe }}</p>
 
     {% if user.username == post.author|string %}
         <a class="btn btn-primary" href="{% url 'post_edit' slug=post.slug%}">
@@ -23,23 +23,33 @@
         </a>
     {% endif %}
     <hr>
-    <a class="btn btn-primary btn-comment" href="{% url 'add_comment_to_post' slug=post.slug %}">Add Comment</a>
+    <form action="{% url 'add_comment_to_post' slug=post.slug %}" method="post">
+        {% csrf_token %}
+        <div class="commentborder">
+            <p>{{ form.text }}</p>
+        </div>
+        <div class="commentfooter">
+            <button id="cancelbutton" type="reset">Cancel</button>
+            <input id="commentbutton" class="btn btn-primary" type="submit" value="Post">
+        </div>
+    </form>
     <div class="container">
         {% for comment in post.comments.all %}
             <br>
             {% if user.is_authenticated %}
-                {{ comment.created_date }}
-                {% if user.username == comment.author|string %}
-                    <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}">
-                        <span class="fa fa-trash"></span>
-                    </a>
+            <h4><a href="" style="color: black;">{{ comment.author }}</a>
+                {% if user.username|string == comment.author|string %}
+                <a class="btn btn-default" href="{% url 'comment_remove' pk=comment.pk %}">
+                    <span class="fa fa-trash"></span>
+                </a>
                 {% endif %}
-                <p>{{ comment.text|safe|linebreaks }}</p>
-                <p>Posted By: {{ comment.author }}</p>
-            <hr style="border-width: 2px;background-color: black;">
+
+            </h4>
+                <p>{{ comment.text }}</p>
+                <p>{{ comment.created_date }}</p>
+                <hr style="border-width: 2px;background-color: black;">
             {% endif %}
             {% empty %}
-            <p>No Comments</p>
         {% endfor %}
     </div>
 {% endblock %}

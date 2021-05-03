@@ -29,7 +29,7 @@
 <body>
     <nav class="navbar navbar-dark bg-dark techfont custom-navbar navbar-expand-lg">
         <div class="container ml-auto mr-auto">
-            <a class="navbar-brand bigbrand" href="{% url 'post_list' %}">My Blog</a>
+            <a class="navbar-brand bigbrand" href="{% url 'post_list' %}">Bloguk</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -45,7 +45,7 @@
                             <a class="nav nav-link" href="{% url 'post_draft_list' %}">Drafts</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav nav-link" href="{% url 'user_detail' pk=request.user.pk %}">Profile</a>
+                            <a class="nav nav-link" href="{% url 'user_detail' slug=request.user %}">Profile</a>
                         </li>
                         {% else %}
                         <li class="nav-item "><a style="font-family:'Courier New', Courier, monospace;" class="nav nav-link" href="{% url 'login' %}">Login</a></li>
